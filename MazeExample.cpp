@@ -22,8 +22,50 @@ using namespace std;
 */
 
 
-void SolveMaze(int row, int col, char maze[][100], int rowSz, int colSz, bool& foundEnd, string& finaldir, string currDir) {
+void SolveMaze(int row, int col, char maze[][100],
+               int rowSize, int colSize,
+               bool &foundEnd, string currDir, string &finalDir) {
 
+    // Already found the end from a previous SolveMaze call
+    if (foundEnd) {
+        return;
+    }
+
+    // base case for bounds
+    if (row < 0 || col < 0 ||
+    row >= rowSize || col >= colSize) {
+        return;
+    }
+
+    // base case for bound end
+    if (maze[row][col] == 'F') {
+        finalDir = currDir;
+        foundEnd = true;
+        return;
+    }
+
+    // Base case for previously explored spots
+    if (maze[row][col] == '.') {
+        return;
+    }
+
+    // Base case for walls
+    if (maze[row][col] == '@') {
+        return;
+    }
+
+    maze[row][col] = '.';
+
+    SolveMaze(row - 1, col, maze, rowSize, colSize, foundEnd, currDir + "U", finalDir); // North
+    SolveMaze(row + 1, col, maze, rowSize, colSize, foundEnd, currDir + "D", finalDir); // South
+    SolveMaze(row, col + 1, maze, rowSize, colSize, foundEnd, currDir + "R", finalDir); // East
+    SolveMaze(row, col - 1, maze, rowSize, colSize, foundEnd, currDir + "L", finalDir); // West
+
+    // If I have not found the end after exploring all 4 directions
+    // pick up the breadcrumb
+    if (!foundEnd) {
+        maze[row][col] = ' ';
+    }
 }
 
 int main()
@@ -65,7 +107,7 @@ int main()
 
 	string finaldir = "";
 	string currDir = "";
-	SolveMaze(startRow, startCol, maze, rowSz, colSz, foundEnd, finaldir, currDir);
+	SolveMaze(startRow, startCol, maze, rowSz, colSz, foundEnd, currDir, finaldir);
 	
 	cout << "Directions: " << finaldir << endl;
 
